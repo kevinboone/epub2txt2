@@ -1,0 +1,10 @@
+use uint32_t and avoid all buiilt-in wide-string functions.
+
+Output is wrapeed by default, if a terminal width can be
+detected, even if the output is redirected to another application. So epup2txt file.epub | more should work, even without 
+specifying a terminal width, so long as the command is
+run from a terminal. If it isn't run from a terminal, or
+the terminal won't report it's width, the default with is
+80 columns. To restore the version-1 behaviour specify a
+zero width (-w 0), which in effect means "unlimited width".
+

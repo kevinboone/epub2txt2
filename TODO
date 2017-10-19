@@ -1,0 +1,3 @@
+Format characters include the white space after tokens,
+which doesn't show up with bold, etc., but is still wrong.
+

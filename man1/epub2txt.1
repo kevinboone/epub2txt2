@@ -1,0 +1,80 @@
+.\" Copyright (C) 2013-17 Kevin Boone 
+.\" Permission is granted to any individual or institution to use, copy, or
+.\" redistribute this software so long as all of the original files are
+.\" included, and that this copyright notice is retained.
+.\"
+.TH epub2txt 1 "October 2017"
+.SH NAME
+epub2txt \- Extract text from EPUB documents 
+.SH SYNOPSIS
+.B epub2txt 
+.RB [options]\ {files...} 
+.PP
+
+.SH DESCRIPTION
+\fIepub2txt\fR is simple utility for extracting text from EPUB
+documents. It is mainly intended for reading EPUB e-books on systems
+that cannot run a graphical EPUB viewer, and favours speed over
+optimal rendering of complex layout.
+
+The output is to \fIstdout\fR; if multiple files are specified,
+they are simply processed sequentially. Unless otherwise specified,
+the character encoding of the output is the same as for the EPUB
+source, which is invariably UTF-8. However, \fIepub2txt\fR can
+attempt to output plain ASCII if required.
+
+
+.SH "OPTIONS"
+.TP
+.BI -a,\-\-ascii
+Converts Unicode characters in the EPUB document that have close
+ASCII equivalents to ASCII. 
+For example, the Unicode left single quote is similar to
+an ASCII straight quote. This option is intended for use when feeding
+the output of \fIepub2txt\fR into another utility that cannot deal
+with properly UTF8 encoding. However, many Unicode characters
+have no ASCII equivalents.
+.LP
+.TP
+.BI -d,\-\-debug {0-4}
+Set the level of debugging information, from 0 (none) to
+4 (extremely detailed tracing).
+.LP
+.TP
+.BI -n,\-\-noansi
+Do not use ANSI terminal highlighting, even when running in
+a terminal. Some pagers, e.g., \fImore\fR do not always
+handle ANSI codes properly 
+.LP
+.TP
+.BI -r,\-\-raw
+No formatting at all. This mode is different to setting
+unlimited width (\fI-w\ 0\fR) in that whitespace is not trimmed, 
+successive empty lines are not collapsed, and \fI--noansi\fR 
+is implied. This is the fastest way to extract text, and is appropriate
+when feeding output to an external formatter such as \fIgroff\fR.
+.LP
+.TP
+.BI -w,\-\-width {columns}
+Format the output to fit into a specified width. If this option is
+omitted, the width is determined from the terminal, if possible.
+If not, then the width defaults to 80 characters. If 
+the width is set to zero or less,  
+then the output is assumed to be of
+unlimited width. Setting unlimited width can be useful in
+situations where the output is being processed
+by another application.  between paragraphs). 
+.LP
+.TP
+.BI -v,\-\-version
+Displays the version and copyright infomation.
+.LP
+
+.SH AUTHOR AND LEGAL
+\fIepub2txt\fR
+is maintained by Kevin Boone, and is open source under the
+terms of the GNU Public Licence, version 3.0. There is no warranty
+of any kind.
+
+
+.\" end of file
