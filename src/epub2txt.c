@@ -21,6 +21,144 @@
 #include "sxmlc.h"
 #include "xhtml.h"
 
+/*============================================================================
+  epub2txt_unescape_html
+  The metadata fields in EPUB are XHTML escaped into plain text using
+  XHTML entities. Ugh. So we need to convert the entities into plain
+  XHTML characters like < and >, and then format the result as XHTML.
+  This is all a colossal time and effort for little to no gain, but 
+  automated EPUB tools do put (X)HTML into the metadata, so we have to
+  be prepared to remove it.
+============================================================================*/
+static char *epub2txt_unescape_html (const char *s)
+  {
+  typedef enum {MODE_ANY=0, MODE_AMP=1} Mode;
+
+  Mode mode = MODE_ANY;
+
+  String *out = string_create_empty();
+  WString *in = wstring_create_from_utf8(s);
+  WString *ent = wstring_create_empty();
+
+  int i, l = wstring_length (in);
+  for (i = 0; i < l; i++)
+    {
+    const uint32_t *ws = wstring_wstr (in);
+    int c = ws[i];
+
+    if (mode == MODE_AMP)
+      {
+      if (c == ';') 
+        {
+        WString *trans = xhtml_translate_entity (ent);
+        char *trans_utf8 = wstring_to_utf8 (trans); 
+        string_append (out, trans_utf8);
+        free (trans_utf8);
+        wstring_destroy (trans);
+        wstring_clear (ent);
+        mode = MODE_ANY; 
+        }
+      else
+        {
+        wstring_append_c (ent, c);
+        }
+      }
+    else
+      {
+      if (c == '&') 
+        mode = MODE_AMP; 
+      else
+        string_append_c (out, c);
+      }
+    }
+
+  wstring_destroy (ent);
+  wstring_destroy (in);
+  char *ret = strdup (string_cstr (out));
+  string_destroy (out);
+  return ret;
+  }
+
+
+/*============================================================================
+  epub2txt_format_meta
+============================================================================*/
+static void epub2txt_format_meta (const Epub2TxtOptions *options, 
+          const char *key, const char *text)
+  {
+  char *ss = epub2txt_unescape_html (text);
+  char *s;
+  asprintf (&s, "%s: %s", key, ss);
+  char *error = NULL;
+  xhtml_utf8_to_stdout (s, options, &error);
+  if (error) free (error);
+  free (s);
+  free (ss);
+  }
+
+
+/*============================================================================
+  epub2txt_dump_metadata
+  Parse the OPF file to print document metadata 
+============================================================================*/
+static List *epub2txt_dump_metadata (const char *opf, 
+        const Epub2TxtOptions *options, char **error)
+  {
+  IN
+  List *ret = NULL;
+  String *buff = NULL;
+  if (string_create_from_utf8_file (opf, &buff, error))
+    {
+    const char *buff_cstr = string_cstr (buff);
+    log_debug ("Read OPF, size %d", string_length (buff));
+    XMLNode *metadata = NULL;
+    XMLDoc doc;
+    XMLDoc_init (&doc);
+    if (XMLDoc_parse_buffer_DOM (buff_cstr, APPNAME, &doc))
+      {
+      XMLNode *root = XMLDoc_root (&doc);
+
+      int i, l = root->n_children;
+      for (i = 0; i < l; i++)
+	{
+	XMLNode *r1 = root->children[i];
+	if (strcmp (r1->tag, "metadata") == 0 || strstr (r1->tag, ":metadata"))
+	  {
+	  metadata = r1;
+          int i, l = metadata->n_children;
+          for (i = 0; i < l; i++)
+	    {
+	    XMLNode *r2 = metadata->children[i];
+            const char *mdtag = r2->tag;
+            const char *mdtext = r2->text;
+            if (strstr (mdtag, "creator"))
+              epub2txt_format_meta (options, "Creator", mdtext);
+            else if (strstr (mdtag, "publisher"))
+              epub2txt_format_meta (options, "Publisher", mdtext);
+            else if (strstr (mdtag, "description"))
+              epub2txt_format_meta (options, "Description", mdtext);
+            else if (strstr (mdtag, "subject"))
+              epub2txt_format_meta (options, "Subject", mdtext);
+            else if (strstr (mdtag, "language"))
+              epub2txt_format_meta (options, "Language", mdtext);
+            else if (strstr (mdtag, "title"))
+              epub2txt_format_meta (options, "Title", mdtext);
+            }
+	  }
+        }
+      XMLDoc_free (&doc);
+      }
+    else
+      {
+      asprintf (error, "Can't parse OPF XML");
+      }
+    string_destroy (buff);
+    }
+
+  OUT
+  return ret;
+  }
+
 
 /*============================================================================
   epub2txt_get_items
@@ -247,18 +385,35 @@ void epub2txt_do_file (const char *file, const Epub2TxtOptions *options,
       char *p = strrchr (content_dir, '/');
       *p = 0; 
       log_debug ("Content directory is: %s", content_dir);
-      List *list = epub2txt_get_items (opf, error);
-      if (*error == NULL)
+
+
+      if (options->meta)
         {
-        log_debug ("EPUB spine has %d items", list_length (list));
-        int i, l = list_length (list);
-        for (i = 0; i < l; i++)
+        epub2txt_dump_metadata (opf, options, error);
+        if (*error)
           {
-          const char *item = (const char *)list_get (list, i);
-          sprintf (opf, "%s/%s", content_dir, item);
-          xhtml_to_stdout (opf, options, error);
+          // Log it as a warning, but don't give up reading the document
+          log_warning (*error);
+          free (*error);
+          *error = NULL;
           }
-        list_destroy (list);
+        }
+
+      if (!options->notext)
+        {
+	List *list = epub2txt_get_items (opf, error);
+	if (*error == NULL)
+	  {
+	  log_debug ("EPUB spine has %d items", list_length (list));
+	  int i, l = list_length (list);
+	  for (i = 0; i < l; i++)
+	    {
+	    const char *item = (const char *)list_get (list, i);
+	    sprintf (opf, "%s/%s", content_dir, item);
+	    xhtml_file_to_stdout (opf, options, error);
+	    }
+	  list_destroy (list);
+	  }
         }
       free (content_dir);
       }

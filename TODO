@@ -1,3 +1,8 @@
 Format characters include the white space after tokens,
 which doesn't show up with bold, etc., but is still wrong.
 
+Metadata could be handled more elegantly; not all attributes
+are shown at all.
+
+Output single HTML document?
+

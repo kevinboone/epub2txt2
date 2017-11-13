@@ -20,6 +20,7 @@
 #include "string.h"
 #include "wstring.h"
 #include "wrap.h"
+#include "xhtml.h"
 
 /*============================================================================
   Format definition stuff 
@@ -431,7 +432,7 @@ WString *xhtml_transform_char (uint32_t c, BOOL to_ascii)
 /*============================================================================
   xhtml_translate_entity
 ============================================================================*/
-WString *xhtml_translate_entity (WString *entity)
+WString *xhtml_translate_entity (const WString *entity)
   {
   char out[20];
   IN
@@ -567,19 +568,58 @@ BOOL xhtml_all_white (WString *s)
 
 
 /*============================================================================
-  xhtml_to_stdout
+  xhtml_utf8_to_stdout
 ============================================================================*/
-void xhtml_to_stdout (const char *filename, const Epub2TxtOptions *options, 
+void xhtml_utf8_to_stdout (const char *s, const Epub2TxtOptions *options, 
+       char **error)
+  {
+  IN
+  char *ss;
+  // This is all a bit ugly. The entity translation is in 
+  //  xhtml_to_stdout, which expects something that looks like a viable
+  //  XHTML file. There's no guarantee that the input to this function
+  //  will actually be a full XHTML file, so we must wrap it in a body
+  //  to fool xhtml_to_stdout. Ugh.
+  asprintf (&ss, "<body>%s</body>", s);
+  WString *sw = wstring_create_from_utf8 (ss); 
+  xhtml_to_stdout (sw, options, error);
+  wstring_destroy (sw);
+  free (ss);
+  OUT
+  }
+
+/*============================================================================
+  xhtml_file_to_stdout
+============================================================================*/
+void xhtml_file_to_stdout (const char *filename, const Epub2TxtOptions *options, 
              char **error)
   {
   IN
   log_debug ("Process XHTML file %s", filename);
 
-  typedef enum {MODE_ANY=0, MODE_INTAG = 1, MODE_ENTITY = 2} Mode;
-
   WString *s;
   wstring_create_from_utf8_file (filename, &s, error); 
   if (*error == NULL)
+     {
+     xhtml_to_stdout (s, options, error);
+     wstring_destroy (s);
+     }
+
+  OUT
+  }
+
+/*============================================================================
+  xhtml_to_stdout
+============================================================================*/
+void xhtml_to_stdout (const WString *s, const Epub2TxtOptions *options, 
+             char **error)
+  {
+  IN
+  log_debug ("Process XHTML string");
+
+  typedef enum {MODE_ANY=0, MODE_INTAG = 1, MODE_ENTITY = 2} Mode;
+
+  if (TRUE)
      {
      int width;
      if (options->width <= 0)
@@ -772,7 +812,6 @@ void xhtml_to_stdout (const char *filename, const Epub2TxtOptions *options,
 
      wstring_destroy (tag);
      wstring_destroy (entity);
-     wstring_destroy (s);
      wstring_destroy (para);
 
      wraptext_eof (context);

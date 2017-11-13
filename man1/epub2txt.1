@@ -41,10 +41,19 @@ Set the level of debugging information, from 0 (none) to
 4 (extremely detailed tracing).
 .LP
 .TP
+.BI -m,\-\-meta
+Output document meta-data: title, creator, description, etc.
+.LP
+.TP
 .BI -n,\-\-noansi
 Do not use ANSI terminal highlighting, even when running in
 a terminal. Some pagers, e.g., \fImore\fR do not always
-handle ANSI codes properly 
+handle ANSI codes properly .
+.LP
+.TP
+.BI \-\-notext
+Do not output the document body. At present, useful only with
+\fI--meta\fR.
 .LP
 .TP
 .BI -r,\-\-raw
@@ -56,7 +65,8 @@ when feeding output to an external formatter such as \fIgroff\fR.
 .LP
 .TP
 .BI -w,\-\-width {columns}
-Format the output to fit into a specified width. If this option is
+Format the output to fit into a specified width. If this option 
+is
 omitted, the width is determined from the terminal, if possible.
 If not, then the width defaults to 80 characters. If 
 the width is set to zero or less,  

@@ -27,17 +27,21 @@ int main (int argc, char **argv)
   BOOL is_a_tty = FALSE;
   BOOL noansi = FALSE;
   BOOL raw = FALSE;
+  BOOL meta = FALSE;
+  BOOL notext = FALSE;
   int width = 80;
 
   static struct option long_options[] =
     {
      {"ascii", no_argument, NULL, 'a'},
      {"raw", no_argument, NULL, 'r'},
+     {"meta", no_argument, NULL, 'm'},
      {"version", no_argument, NULL, 'v'},
      {"noansi", no_argument, NULL, 'n'},
      {"width", required_argument, NULL, 'w'},
      {"log", required_argument, NULL, 'l'},
      {"help", no_argument, NULL, 'h'},
+     {"notext", no_argument, NULL, 0},
      {0, 0, 0, 0}
     };
 
@@ -76,7 +80,7 @@ int main (int argc, char **argv)
   while (1)
     {
     int option_index = 0;
-    opt = getopt_long (argc, argv, "avw:l:nr",
+    opt = getopt_long (argc, argv, "avw:l:nrm",
       long_options, &option_index);
 
     if (opt == -1) break;
@@ -98,6 +102,10 @@ int main (int argc, char **argv)
           ascii = TRUE; 
         else if (strcmp (long_options[option_index].name, "noansi") == 0)
           noansi = TRUE; 
+        else if (strcmp (long_options[option_index].name, "meta") == 0)
+          meta = TRUE; 
+        else if (strcmp (long_options[option_index].name, "notext") == 0)
+          notext = TRUE; 
         else
           exit (-1);
       case 'a':
@@ -111,9 +119,11 @@ int main (int argc, char **argv)
       case 'r':
        raw = TRUE; break;
       case 'l':
-        log_set_level (atoi(optarg)); 
+        log_set_level (atoi(optarg)); break;
+      case 'm':
+        meta = TRUE; break;
       case 'w':
-        width = atoi (optarg); 
+        width = atoi (optarg); break;
       }
     }
 
@@ -131,7 +141,9 @@ int main (int argc, char **argv)
     printf ("  -a,--ascii         try to output ASCII only\n");
     printf ("  -h,--help          show this message\n");
     printf ("  -l,--log=N         set log level, 0-4\n");
+    printf ("  -m,--meta          dump document metadata\n");
     printf ("  -n,--noansi        don't output ANSI terminal codes\n");
+    printf ("     --notext        don't output document body\n");
     printf ("  -r,--raw           no formatting at all\n");
     printf ("  -v,--version       show version\n");
     printf ("  -w,--width=N       set output width\n");
@@ -149,6 +161,8 @@ int main (int argc, char **argv)
   memset (&options, 0, sizeof (options));
   options.width = width;
   options.ascii = ascii;
+  options.meta = meta;
+  options.notext = notext;
 
   if (is_a_tty)
     options.ansi = TRUE;

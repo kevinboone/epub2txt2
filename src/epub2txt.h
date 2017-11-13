@@ -14,6 +14,8 @@ typedef struct _Epub2TxtOptions
   BOOL ascii; // Reduce output to ASCII
   BOOL ansi; // Emit ANSI terminal codes
   BOOL raw; // Completely unformatted output 
+  BOOL meta; // Show metadata
+  BOOL notext; // Don't dump text 
   } Epub2TxtOptions;
 
 void epub2txt_do_file (const char *file, const Epub2TxtOptions *options, 
