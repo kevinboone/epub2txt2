@@ -10,7 +10,13 @@
 ============================================================================*/
 
 #include <stdio.h>
+
+#if defined(__MACH__)
+#include <stdlib.h>
+#else 
 #include <malloc.h>
+#endif
+
 #include <string.h>
 #include <stdlib.h>
 #include "defs.h" 
