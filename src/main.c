@@ -183,5 +183,7 @@ int main (int argc, char **argv)
       free (error);
       }
     }
+
+    exit (0);
   }
 
