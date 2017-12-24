@@ -8,7 +8,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <memory.h>
+
+#if !defined(__MACH__)
 #include <malloc.h>
+#endif
+
 #include <pthread.h>
 #include "list.h" 
 
