@@ -29,11 +29,13 @@ int main (int argc, char **argv)
   BOOL raw = FALSE;
   BOOL meta = FALSE;
   BOOL notext = FALSE;
+  BOOL calibre = FALSE;
   int width = 80;
 
   static struct option long_options[] =
     {
      {"ascii", no_argument, NULL, 'a'},
+     {"calibre", no_argument, NULL, 'c'},
      {"raw", no_argument, NULL, 'r'},
      {"meta", no_argument, NULL, 'm'},
      {"version", no_argument, NULL, 'v'},
@@ -80,7 +82,7 @@ int main (int argc, char **argv)
   while (1)
     {
     int option_index = 0;
-    opt = getopt_long (argc, argv, "avw:l:nrm",
+    opt = getopt_long (argc, argv, "avw:l:nrmch",
       long_options, &option_index);
 
     if (opt == -1) break;
@@ -100,6 +102,8 @@ int main (int argc, char **argv)
           raw = TRUE; 
         else if (strcmp (long_options[option_index].name, "ascii") == 0)
           ascii = TRUE; 
+        else if (strcmp (long_options[option_index].name, "calibre") == 0)
+          calibre = TRUE; 
         else if (strcmp (long_options[option_index].name, "noansi") == 0)
           noansi = TRUE; 
         else if (strcmp (long_options[option_index].name, "meta") == 0)
@@ -110,6 +114,8 @@ int main (int argc, char **argv)
           exit (-1);
       case 'a':
         ascii = TRUE; break;
+      case 'c':
+        calibre = TRUE; break;
       case 'n':
         noansi = TRUE; break;
       case 'h':
@@ -139,6 +145,7 @@ int main (int argc, char **argv)
     {
     printf ("Usage: %s [options] {files...}\n", argv[0]);
     printf ("  -a,--ascii         try to output ASCII only\n");
+    printf ("  -c,--calibre       show Calibre metadata (with -m)\n");
     printf ("  -h,--help          show this message\n");
     printf ("  -l,--log=N         set log level, 0-4\n");
     printf ("  -m,--meta          dump document metadata\n");
@@ -163,6 +170,7 @@ int main (int argc, char **argv)
   options.ascii = ascii;
   options.meta = meta;
   options.notext = notext;
+  options.calibre = calibre;
 
   if (is_a_tty)
     options.ansi = TRUE;

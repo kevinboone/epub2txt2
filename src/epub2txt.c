@@ -135,6 +135,14 @@ static List *epub2txt_dump_metadata (const char *opf,
               epub2txt_format_meta (options, "Creator", mdtext);
             else if (strstr (mdtag, "publisher"))
               epub2txt_format_meta (options, "Publisher", mdtext);
+            else if (strstr (mdtag, "date"))
+              {
+              char *mdate = strdup (mdtext);
+              char *p = strchr (mdate, '-');
+              if (p) *p = 0;
+              epub2txt_format_meta (options, "Date", mdate);
+              free (mdate);
+              }
             else if (strstr (mdtag, "description"))
               epub2txt_format_meta (options, "Description", mdtext);
             else if (strstr (mdtag, "subject"))
@@ -143,6 +151,56 @@ static List *epub2txt_dump_metadata (const char *opf,
               epub2txt_format_meta (options, "Language", mdtext);
             else if (strstr (mdtag, "title"))
               epub2txt_format_meta (options, "Title", mdtext);
+            else if (strstr (mdtag, "meta") && options->calibre)
+              {
+	      int k, nattrs = r2->n_attributes;
+              for (k = 0; k < nattrs; k++)
+                {
+		const char *value= r2->attributes[k].value;
+                if (strcmp (value, "calibre:series") == 0)
+                  {
+	          int j; 
+                  for (j = 0; j < r2->n_attributes; j++)
+                    {
+                    if (strcmp (r2->attributes[j].name, "content") == 0)
+                      epub2txt_format_meta (options, 
+                        "Calibre series", r2->attributes[j].value);
+                    }
+                  }
+                else if (strcmp (value, "calibre:series_index") == 0)
+                  {
+	          int j;
+                  for (j = 0; j < r2->n_attributes; j++)
+                    {
+                    if (strcmp (r2->attributes[j].name, "content") == 0)
+                      {
+                      char *s = strdup (r2->attributes[j].value);
+                      // For some reason, Calibre stores the series index
+                      //  as a decimal. Remove fraction.
+                      char *p = strchr (s, '.');
+                      if (p) *p = 0;
+                      epub2txt_format_meta (options, 
+                        "Calibre series index", s);
+                      free (s);
+                      }
+                    }
+                  }
+                else if (strcmp (value, "calibre:title_sort") == 0)
+                  {
+	          int j;
+                  for (j = 0; j < r2->n_attributes; j++)
+                    {
+                    if (strcmp (r2->attributes[j].name, "content") == 0)
+                      {
+                      char *s = strdup (r2->attributes[j].value);
+                      epub2txt_format_meta (options, 
+                        "Calibre title sort", s);
+                      free (s);
+                      }
+                    }
+                  }
+                }
+              }
             }
 	  }
         }
@@ -340,9 +398,9 @@ void epub2txt_do_file (const char *file, const Epub2TxtOptions *options,
     log_debug ("File access OK");
 
     //output_para = 0;
-    char tempdir[256];
+    char tempdir[512];
     char tempbase[256];
-    char cmd[512];
+    char cmd[1024];
 
     if (getenv ("TMP"))
       strcpy (tempbase, getenv("TMP"));
@@ -372,7 +430,7 @@ void epub2txt_do_file (const char *file, const Epub2TxtOptions *options,
     log_debug ("Permissions fixed");
 
 
-    char opf[512];
+    char opf[1024];
     sprintf (opf, "%s/META-INF/container.xml", tempdir);
     log_debug ("OPF path is: %s", opf);
     String *rootfile = epub2txt_get_root_file (opf, error);
