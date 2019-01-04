@@ -89,6 +89,7 @@ BOOL wstring_create_from_utf8_file (const char *filename,
     int64_t size = sb.st_size;
     char *buff = malloc (size + 2);
     int n = read (f, buff, size);
+    close (f);
     buff[n] = 0;
 
     self->str = wstring_convert_utf8_to_utf32 (buff);
