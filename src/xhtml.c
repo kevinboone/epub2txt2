@@ -638,6 +638,7 @@ void xhtml_to_stdout (const WString *s, const Epub2TxtOptions *options,
      WString *para = wstring_create_empty();
      int i, l = wstring_length (s);
      uint32_t last_c = 0;
+     int taglen = 0;
 
      const uint32_t *text = wstring_wstr (s);
      for (i = 0; i < l; i++)
@@ -652,6 +653,7 @@ void xhtml_to_stdout (const WString *s, const Epub2TxtOptions *options,
 	//printf ("c=%c %04x\n", (char)c, c);
 	if (mode == MODE_ANY && c == '<')
 	  {
+          taglen = 0;
 	  mode = MODE_INTAG;
 	  }
 	else if (mode == MODE_ANY && c == '\n')
@@ -700,6 +702,7 @@ void xhtml_to_stdout (const WString *s, const Epub2TxtOptions *options,
 	  }
 	else if (mode == MODE_INTAG && c == '>')
 	  {
+          taglen = 0;
           Format format = FORMAT_NONE;
 	  char *ss_tag = wstring_to_utf8 (tag);
 	  char *p = strchr (ss_tag, ' ');
@@ -800,13 +803,28 @@ void xhtml_to_stdout (const WString *s, const Epub2TxtOptions *options,
 	  }
 	else if (mode == MODE_INTAG)
 	 {
+         taglen++;
+         // Bug #5 -- Added support to abort tag reading if tag > 1000 
+         //   characters. This is an arbitrary number, but it's larger than
+         //   any tag that we can handle. 
+         if (taglen > 1000)
+           {
+           while (i < l)
+             {
+             uint32_t c = text[i];  
+             if (c == (uint32_t)'>')
+               {
+               wstring_clear (tag);
+               }
+             i++;
+             }
+           }
 	 wstring_append_c (tag, c);
 	 }
 	else
 	  log_error ("Unexpected character %d in mode %d", c, mode);
 	last_c = c;
         }
-
      if (wstring_length (para) > 0)
       xhtml_flush_para (para, options, context); 
 

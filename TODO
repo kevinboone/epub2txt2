@@ -6,3 +6,5 @@ are shown at all.
 
 Output single HTML document?
 
+Refactor wstring memory management, so that appanding a single
+character is faster.
