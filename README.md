@@ -74,7 +74,7 @@ be used instead.
 
 ## Building and installing 
 
-`epub2txt` is alaready available for a number of Linux
+`epub2txt` is already available for a number of Linux
 distributions, but to get the latest version it is usually best to
 build from source. This should be straightforward if `gcc`
 and `make` are installed.
@@ -83,8 +83,6 @@ All you should need to do is
     $ make
     $ sudo make install
 
-For information about obtaining the source code, see the Downloads
-section of this document.
 
 ## Command-line switches 
 
