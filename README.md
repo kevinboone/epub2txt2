@@ -235,19 +235,12 @@ even approximately, in ASCII.
 Date | Change
 -------------
 2.01,&nbsp;January&nbsp;2019 | Various bug fixes
-
 2.0,&nbsp;Ocotber&nbsp;2017 | Completely re-written to do all text processing using 32-bit character arrays, rather than UTF-8 strings, to improve handling of non-English documents.
-
 0.1.5,&nbsp;September&nbsp;2017 | Some fixes related to line-wrapping with multi-byte characters; support (after a fashion) for manifest files with namespaces.
-
 0.1.4,&nbsp;May&nbsp;2017 | Remove unnecessary KBOX support kludges
-
 0.1.3,&nbsp;March&nbsp;2016 | Fixed a bug that caused epub2txt to fail when XML files contained a UTF-8 BOM
-
 0.1.2,&nbsp;September&nbsp;2015 | Fixed a bug that caused strings like "%222022020," which might legitimately appear in URLs, to be treated as text length specifiers. 
-
 0.1.1,&nbsp;April&nbsp;2015 | Fixed some bugs with integer sizes that caused problems on 64-bit systems
-
 0.0.1 | First functional release
 
 ## Author and legal 
