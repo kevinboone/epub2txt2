@@ -35,6 +35,9 @@ typedef enum { FORMAT_NONE,
                FORMAT_H4_ON, FORMAT_H4_OFF,
                FORMAT_H5_ON, FORMAT_H5_OFF } Format;
 
+/* bitmasks for ANSI highlighting */
+enum { FMT_BOLD = 1 << 0,
+       FMT_ITAL = 1 << 1 };
 
 /*============================================================================
   xhtml_is_start_format_tag
@@ -202,6 +205,97 @@ void xhtml_emit_format (const Epub2TxtOptions *options, Format format)
       case FORMAT_H4_OFF:
       case FORMAT_H5_OFF:
 	 printf ("\x1B[0m"); break;
+
+      }
+    }
+  OUT
+  }
+
+/*============================================================================
+  xhtml_emit_fmt_eol_pre
+============================================================================*/
+void xhtml_emit_fmt_eol_pre (WrapTextContext *context)
+  {
+  IN
+  
+  unsigned int fmt = wraptext_context_get_fmt (context);
+  const Epub2TxtOptions *options = (Epub2TxtOptions *) wraptext_context_get_app_opts (context);
+
+  if (options->ansi && !options->raw && fmt)
+    {
+    /* reset ANSI escape-sequence at EOL. */
+    xhtml_emit_format (options, FORMAT_BOLD_OFF);
+    }
+  OUT
+  }
+
+/*============================================================================
+  xhtml_emit_fmt_eol_post
+============================================================================*/
+void xhtml_emit_fmt_eol_post (WrapTextContext *context)
+  {
+  IN
+  
+  unsigned int fmt = wraptext_context_get_fmt (context);
+  const Epub2TxtOptions *options = (Epub2TxtOptions *) wraptext_context_get_app_opts (context);
+
+  if (options->ansi && !options->raw && fmt)
+    {
+    /* turn those set, back on at BOL. */
+    if (fmt & FMT_BOLD)
+      xhtml_emit_format (options, FORMAT_BOLD_ON);
+    if (fmt & FMT_ITAL)
+      xhtml_emit_format (options, FORMAT_ITALIC_ON);
+    }
+  OUT
+  }
+
+/*============================================================================
+  xhtml_set_format
+============================================================================*/
+void xhtml_set_format (const Epub2TxtOptions *options, Format format, WrapTextContext *context)
+  {
+  IN
+  
+  if (options->ansi && !options->raw)
+    {
+    switch (format)
+      {
+      case FORMAT_BOLD_ON:
+        wraptext_context_set_fmt (context, FMT_BOLD);
+        break;
+
+      case FORMAT_BOLD_OFF:
+        wraptext_context_reset_fmt (context, FMT_BOLD);
+        break;
+
+      case FORMAT_ITALIC_ON:
+        wraptext_context_set_fmt (context, FMT_ITAL);
+        break;
+
+      case FORMAT_ITALIC_OFF:
+        wraptext_context_reset_fmt (context, FMT_ITAL);
+        break;
+
+      case FORMAT_NONE:
+        wraptext_context_zero_fmt (context);
+        break;
+
+      case FORMAT_H1_ON:
+      case FORMAT_H2_ON:
+      case FORMAT_H3_ON:
+      case FORMAT_H4_ON:
+      case FORMAT_H5_ON:
+        wraptext_context_set_fmt (context, FMT_BOLD);
+        break;
+
+      case FORMAT_H1_OFF:
+      case FORMAT_H2_OFF:
+      case FORMAT_H3_OFF:
+      case FORMAT_H4_OFF:
+      case FORMAT_H5_OFF:
+        wraptext_context_reset_fmt (context, FMT_BOLD);
+        break;
 
       }
     }
@@ -629,6 +723,7 @@ void xhtml_to_stdout (const WString *s, const Epub2TxtOptions *options,
 
      WrapTextContext *context = wraptext_context_new();
      wraptext_context_set_width (context, width);
+     wraptext_context_set_app_opts (context, (void *)options);
 
      Mode mode = MODE_ANY;
      BOOL inbody = FALSE;
@@ -771,6 +866,7 @@ void xhtml_to_stdout (const WString *s, const Epub2TxtOptions *options,
 	      xhtml_flush_line (para, options, context); 
 	      wstring_clear (para);
               xhtml_emit_format (options, format);
+              xhtml_set_format (options, format, context);
 	      }
 	    }
 	  else if (xhtml_is_end_format_tag (ss_tag, &format))
@@ -779,6 +875,7 @@ void xhtml_to_stdout (const WString *s, const Epub2TxtOptions *options,
 	      {
 	      xhtml_flush_line (para, options, context); 
               xhtml_emit_format (options, format);
+	      xhtml_set_format (options, format, context);
 	      wstring_clear (para);
 	      }
             }
@@ -786,6 +883,7 @@ void xhtml_to_stdout (const WString *s, const Epub2TxtOptions *options,
 	    {
             xhtml_flush_line (para, options, context);
             xhtml_emit_format (options, format);
+            xhtml_set_format (options, format, context);
 	    wstring_clear (para);
 	    xhtml_para_break (context, options);
             }
@@ -795,6 +893,7 @@ void xhtml_to_stdout (const WString *s, const Epub2TxtOptions *options,
             xhtml_flush_line (para, options, context);
 	    wstring_clear (para);
             xhtml_emit_format (options, format);
+            xhtml_set_format (options, format, context);
             }
 
 	  free (ss_tag);

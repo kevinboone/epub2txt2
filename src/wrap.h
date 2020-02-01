@@ -38,6 +38,13 @@ void wraptext_context_free (WrapTextContext *self);
 void wraptext_context_set_output_fn (WrapTextContext *self, 
   WrapTextOutputFn fn);
 
+unsigned int wraptext_context_get_fmt (WrapTextContext *self);
+void wraptext_context_zero_fmt (WrapTextContext *self);
+void wraptext_context_set_fmt (WrapTextContext *self, unsigned int fmt);
+void wraptext_context_reset_fmt (WrapTextContext *self, unsigned int fmt);
+void wraptext_context_set_app_opts (WrapTextContext *self, void *app_opts);
+void *wraptext_context_get_app_opts (WrapTextContext *self);
+
 void wraptext_context_set_flags (WrapTextContext *self, int flags);
 
 void wraptext_context_set_width (WrapTextContext *self, int width);
