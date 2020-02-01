@@ -139,8 +139,9 @@ void _wraptext_flush_string (WrapTextContext *context, WT_UTF32 *s)
 
   if (l + context->priv->column + 1 >= context->priv->width)
     {
+    xhtml_emit_fmt_eol_pre (context);    /* upcall: turn-off all ANSI highlghting before EOL */
     _wraptext_emit_newline (context);
-    xhtml_emit_fmt_eol (context);
+    xhtml_emit_fmt_eol_post (context);   /* upcall: restore ANSI highlighting after EOL */
     context->priv->column = 0;
     }
  
