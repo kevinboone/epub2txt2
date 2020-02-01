@@ -33,6 +33,8 @@ typedef struct _WrapTextContextPriv
   int state;
   int column;
   int white_count;
+  unsigned int fmt;
+  void *app_opts;
   void *app_data;
   BOOL blank_line;
   WT_UTF32 last;
@@ -138,6 +140,7 @@ void _wraptext_flush_string (WrapTextContext *context, WT_UTF32 *s)
   if (l + context->priv->column + 1 >= context->priv->width)
     {
     _wraptext_emit_newline (context);
+    xhtml_emit_fmt_eol (context);
     context->priv->column = 0;
     }
  
@@ -330,6 +333,7 @@ void wraptext_context_reset (WrapTextContext *self)
   self->priv->column = 0;
   self->priv->last = 0;
   self->priv->white_count = 0;
+  self->priv->fmt = 0;
   self->priv->blank_line = TRUE;
   if (self->priv->token) free (self->priv->token);
   self->priv->token = NULL;
@@ -353,11 +357,40 @@ void wraptext_context_set_flags (WrapTextContext *self, int flags)
   self->priv->flags = flags;
   }
 
+void wraptext_context_zero_fmt (WrapTextContext *self)
+  {
+  self->priv->fmt = 0;
+  }
+
+unsigned int wraptext_context_get_fmt (WrapTextContext *self)
+  {
+  return self->priv->fmt;
+  }
+
+void wraptext_context_set_fmt (WrapTextContext *self, unsigned int fmt)
+  {
+  self->priv->fmt |= fmt;
+  }
+
+void wraptext_context_reset_fmt (WrapTextContext *self, unsigned int fmt)
+  {
+  self->priv->fmt &= ~fmt;
+  }
+
+void wraptext_context_set_app_opts (WrapTextContext *self, void *app_opts)
+  {
+  self->priv->app_opts = app_opts;
+  }
+
+void *wraptext_context_get_app_opts (WrapTextContext *self)
+  {
+  return self->priv->app_opts;
+  }
+
 void wraptext_context_set_app_data (WrapTextContext *self, void *app_data)
   {
   self->priv->app_data = app_data;
   }
-
 
 void wraptext_context_free (WrapTextContext *self)
   {
