@@ -24,10 +24,8 @@ clean:
 	$(RM) -r build/ $(TARGET) 
 
 install:
-	mkdir -p $(DESTDIR)/$(PREFIX)/$(BINDIR)
-	cp -p $(APPNAME) $(DESTDIR)/$(PREFIX)/$(BINDIR)
-	mkdir -p $(DESTDIR)/$(PREFIX)/$(MANDIR)/man1/
-	cp -pr man1/* $(DESTDIR)/$(PREFIX)/$(MANDIR)/man1/
+	install -D -m 755 $(APPNAME) $(DESTDIR)/$(PREFIX)/$(BINDIR)/$(APPNAME)
+	install -D -m 644 man1/epub2txt.1 $(DESTDIR)/$(PREFIX)/$(MANDIR)/man1/epub2txt.1
 
 web: 
 	cp README_$(APPNAME).html /home/kevin/docs/kzone5/source
