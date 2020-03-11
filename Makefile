@@ -35,4 +35,4 @@ web:
 
 -include $(DEPS)
 
-.PHONY: clean
+.PHONY: clean install web
