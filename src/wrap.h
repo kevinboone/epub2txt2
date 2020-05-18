@@ -20,7 +20,7 @@ typedef void (*WrapTextOutputFn) (void *app_data, WT_UTF32 c);
 
 struct _WrapTextContextPriv;
 
-typedef struct _WrapTextContent
+typedef struct _WrapTextContext
   {
   struct _WrapTextContextPriv *priv;
   } WrapTextContext;

@@ -20,6 +20,7 @@
 #include "defs.h" 
 #include "wrap.h"
 #include "convertutf.h"
+#include "xhtml.h"
 
 #define WT_STATE_START 0
 #define WT_STATE_WORD 1
