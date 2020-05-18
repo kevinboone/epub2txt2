@@ -1,7 +1,7 @@
 /*============================================================================
   epub2txt v2 
   main.c
-  Copyright (c)2019 Kevin Boone, GPL v3.0
+  Copyright (c)2020 Kevin Boone, GPL v3.0
 ============================================================================*/
 
 #include <stdio.h>
@@ -136,7 +136,7 @@ int main (int argc, char **argv)
   if (show_version)
     {
     printf (APPNAME " version " VERSION "\n");
-    printf ("Copyright (c)2013-2019 Kevin Boone\n");
+    printf ("Copyright (c)2013-2020 Kevin Boone and contributors\n");
     printf ("Distributed under the terms of the GNU Public Licence, v3.0\n");
     exit (0);
     }

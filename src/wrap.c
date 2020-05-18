@@ -1,7 +1,7 @@
 /*============================================================================
   epub2txt v2 
   wrap.c
-  Copyright (c)2017 Kevin Boone, GPL v3.0
+  Copyright (c)2020 Kevin Boone, GPL v3.0
 
   This file contains general-purpose text string wrapping functions, that
   work on 32-bit characters, so each character is a fixed length. This is
