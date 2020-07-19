@@ -184,7 +184,7 @@ void xhtml_emit_format (const Epub2TxtOptions *options, Format format)
 	 printf ("\x1B[0m"); break;
 
       case FORMAT_ITALIC_ON:
-	 printf ("\x1B[3m"); break;
+	printf ("\x1B[3m"); break;
 
       case FORMAT_ITALIC_OFF:
 	 printf ("\x1B[0m"); break;
@@ -245,7 +245,9 @@ void xhtml_emit_fmt_eol_post (WrapTextContext *context)
     if (fmt & FMT_BOLD)
       xhtml_emit_format (options, FORMAT_BOLD_ON);
     if (fmt & FMT_ITAL)
+      {
       xhtml_emit_format (options, FORMAT_ITALIC_ON);
+      }
     }
   OUT
   }
@@ -562,7 +564,7 @@ WString *xhtml_translate_entity (const WString *entity)
     char *s = strdup (in);
     s[0] = '0';
     int v = 0;
-    if (sscanf (s, "%x", &v) == 1)
+    if (sscanf (s, "%d", &v) == 1)
       {
       WString *ret = wstring_create_empty();
       wstring_append_c (ret, (uint32_t)v);
