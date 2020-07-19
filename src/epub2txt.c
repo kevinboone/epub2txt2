@@ -11,6 +11,8 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
+#include <errno.h>
 #ifndef __APPLE__
 #include <malloc.h>
 #endif
@@ -418,68 +420,91 @@ void epub2txt_do_file (const char *file, const Epub2TxtOptions *options,
     //  to run this utility
     mkdir (tempdir, 0777); 
 
-    sprintf (cmd, "unzip -o -qq \"%s\" -d \"%s\"", file, tempdir);
-    log_debug ("Running unzip command; %s", cmd);
-    system (cmd);
-    log_debug ("Unzip finished");
-    // On some systems, unzip results in a file with no read permissions
-    //   for the user -- reason unknown 
-    sprintf (cmd, "chmod -R 744 \"%s\"", tempdir);
-    log_debug ("Fix permissions: %s", cmd);
-    system (cmd);
-    log_debug ("Permissions fixed");
+    BOOL unzip_ok = TRUE;
 
-
-    char opf[1024];
-    sprintf (opf, "%s/META-INF/container.xml", tempdir);
-    log_debug ("OPF path is: %s", opf);
-    String *rootfile = epub2txt_get_root_file (opf, error);
-    if (*error == NULL)
+    log_debug ("Running unzip command");
+    int pid = fork();
+    if (pid == 0)
       {
-      log_debug ("OPF rootfile is: %s", string_cstr(rootfile));
-
-      sprintf (opf, "%s/%s", tempdir, string_cstr (rootfile));
-      char *content_dir = strdup (opf);
-      char *p = strrchr (content_dir, '/');
-      *p = 0; 
-      log_debug ("Content directory is: %s", content_dir);
-
-
-      if (options->meta)
-        {
-        epub2txt_dump_metadata (opf, options, error);
-        if (*error)
-          {
-          // Log it as a warning, but don't give up reading the document
-          log_warning (*error);
-          free (*error);
-          *error = NULL;
-          }
-        }
-
-      if (!options->notext)
-        {
-	List *list = epub2txt_get_items (opf, error);
-	if (*error == NULL)
-	  {
-	  log_debug ("EPUB spine has %d items", list_length (list));
-	  int i, l = list_length (list);
-	  for (i = 0; i < l; i++)
-	    {
-	    const char *item = (const char *)list_get (list, i);
-	    sprintf (opf, "%s/%s", content_dir, item);
-	    xhtml_file_to_stdout (opf, options, error);
-	    }
-	  list_destroy (list);
-	  }
-        }
-      free (content_dir);
+      execlp ("unzip", "unzip", "-o", "-qq", file, "-d", tempdir, NULL);
+      log_error ("Can't execute unzip: %s", strerror (errno));
+      kill (getppid(), SIGTERM);
+      exit (-1);
+      }
+    else
+      {
+      int status = 0;
+      waitpid (pid, &status, 0);
+      // We could set unzip_ok here, but I'm not sure that unzip really
+      //  returns a reliable status code
       }
 
-    if (rootfile) string_destroy (rootfile);
-    sprintf (cmd, "rm -rf \"%s\"", tempdir);
-    log_debug ("Deleting temporary directory");
-    system (cmd); 
+    if (unzip_ok)
+      {
+      log_debug ("Unzip finished");
+      // On some systems, unzip results in a file with no read permissions
+      //   for the user -- reason unknown 
+      sprintf (cmd, "chmod -R 744 \"%s\"", tempdir);
+      log_debug ("Fix permissions: %s", cmd);
+      system (cmd);
+      log_debug ("Permissions fixed");
+
+
+      char opf[1024];
+      sprintf (opf, "%s/META-INF/container.xml", tempdir);
+      log_debug ("OPF path is: %s", opf);
+      String *rootfile = epub2txt_get_root_file (opf, error);
+      if (*error == NULL)
+        {
+        log_debug ("OPF rootfile is: %s", string_cstr(rootfile));
+
+        sprintf (opf, "%s/%s", tempdir, string_cstr (rootfile));
+        char *content_dir = strdup (opf);
+        char *p = strrchr (content_dir, '/');
+        *p = 0; 
+        log_debug ("Content directory is: %s", content_dir);
+
+
+        if (options->meta)
+          {
+          epub2txt_dump_metadata (opf, options, error);
+          if (*error)
+            {
+            // Log it as a warning, but don't give up reading the document
+            log_warning (*error);
+            free (*error);
+            *error = NULL;
+            }
+          }
+
+        if (!options->notext)
+          {
+          List *list = epub2txt_get_items (opf, error);
+          if (*error == NULL)
+	    {
+	    log_debug ("EPUB spine has %d items", list_length (list));
+	    int i, l = list_length (list);
+	    for (i = 0; i < l; i++)
+	      {
+	      const char *item = (const char *)list_get (list, i);
+	      sprintf (opf, "%s/%s", content_dir, item);
+	      xhtml_file_to_stdout (opf, options, error);
+	      }
+	    list_destroy (list);
+	    }
+          }
+        free (content_dir);
+        }
+
+      if (rootfile) string_destroy (rootfile);
+      sprintf (cmd, "rm -rf \"%s\"", tempdir);
+      log_debug ("Deleting temporary directory");
+      system (cmd); 
+      }
+    else
+      {
+      // unzip failed
+      }
     }
   else
     {
