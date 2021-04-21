@@ -407,6 +407,8 @@ void epub2txt_do_file (const char *file, const Epub2TxtOptions *options,
 
     if (getenv ("TMP"))
       strcpy (tempbase, getenv("TMP"));
+    else if (getenv ("TMPDIR"))
+      strcpy (tempbase, getenv("TMPDIR"));
     else
       strcpy (tempbase, "/tmp");
 
