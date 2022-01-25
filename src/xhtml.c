@@ -573,7 +573,10 @@ WString *xhtml_translate_entity (const WString *entity)
       } 
     }
   else 
-    strcpy (out, in);
+    {
+    strncpy (out, in, sizeof (out) - 1);
+    out[sizeof (out) - 1] = 0;
+    }
   free (in);
   OUT
   return wstring_create_from_utf8 (out);

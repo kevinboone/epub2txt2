@@ -1,6 +1,6 @@
 # epub2txt -- Extract text from EPUB documents  
 
-Version 2.02, May 2020 
+Version 2.03, January 2022 
 
 ## What is this? 
 
@@ -232,6 +232,7 @@ even approximately, in ASCII.
 
 Date | Change
 -----|-------
+2.03,&nbsp;Jan&nbsp;2022 | Fixed a buffer overrun bug 
 2.02,&nbsp;May&nbsp;2020 | Updated XML parser 
 2.01,&nbsp;January&nbsp;2019 | Various bug fixes
 2.0,&nbsp;October&nbsp;2017 | Completely re-written to do all text processing using 32-bit character arrays, rather than UTF-8 strings, to improve handling of non-English documents.
