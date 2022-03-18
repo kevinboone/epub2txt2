@@ -9,7 +9,7 @@ MANDIR  := /share/man
 APPNAME := epub2txt
 
 TARGET	:= epub2txt 
-SOURCES := $(shell find src/ -type f -name *.c)
+SOURCES := $(sort $(shell find src/ -type f -name *.c))
 OBJECTS := $(patsubst src/%,build/%,$(SOURCES:.c=.o))
 DEPS	:= $(OBJECTS:.o=.deps)
 
