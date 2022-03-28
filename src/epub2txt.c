@@ -400,28 +400,24 @@ void epub2txt_do_file (const char *file, const Epub2TxtOptions *options,
     {
     log_debug ("File access OK");
 
-    //output_para = 0;
-    char tempdir[512];
-    char tempbase[256];
+    char *tempbase, *tempdir;
     char cmd[1024];
 
-    if (getenv ("TMP"))
-      strcpy (tempbase, getenv("TMP"));
-    else if (getenv ("TMPDIR"))
-      strcpy (tempbase, getenv("TMPDIR"));
-    else
-      strcpy (tempbase, "/tmp");
+    if (!(tempbase = getenv("TMP")) && !(tempbase = getenv("TMPDIR")))
+      tempbase = "/tmp";
 
     log_debug ("tempbase is: %s", tempbase);
 
-    sprintf (tempdir, "%s/epub2txt%d", tempbase, getpid()); 
-
+    asprintf (&tempdir, "%s/epub2txt%d", tempbase, getpid()); 
     log_debug ("tempdir is: %s", tempdir);
 
-    // We should really check this but, honestly, anybody who creates
-    //  a non-writable tempdir has problems far worse than being unable
-    //  to run this utility
-    mkdir (tempdir, 0777); 
+    if (mkdir (tempdir, 0777) == -1)
+      {
+      log_error ("Can't create directory for extraction: \"%s\": %s", tempdir,
+        strerror (errno));
+      free(tempdir);
+      return;
+      }
 
     BOOL unzip_ok = TRUE;
 
@@ -453,15 +449,17 @@ void epub2txt_do_file (const char *file, const Epub2TxtOptions *options,
       log_debug ("Permissions fixed");
 
 
-      char opf[1024];
-      sprintf (opf, "%s/META-INF/container.xml", tempdir);
+      char *opf;
+      asprintf (&opf, "%s/META-INF/container.xml", tempdir);
       log_debug ("OPF path is: %s", opf);
       String *rootfile = epub2txt_get_root_file (opf, error);
       if (*error == NULL)
         {
         log_debug ("OPF rootfile is: %s", string_cstr(rootfile));
 
-        sprintf (opf, "%s/%s", tempdir, string_cstr (rootfile));
+        free (opf);
+        asprintf (&opf, "%s/%s", tempdir, string_cstr (rootfile));
+
         char *content_dir = strdup (opf);
         char *p = strrchr (content_dir, '/');
         *p = 0; 
@@ -490,13 +488,15 @@ void epub2txt_do_file (const char *file, const Epub2TxtOptions *options,
 	    for (i = 0; i < l; i++)
 	      {
 	      const char *item = (const char *)list_get (list, i);
-	      sprintf (opf, "%s/%s", content_dir, item);
+	      free (opf);
+	      asprintf (&opf, "%s/%s", content_dir, item);
 	      xhtml_file_to_stdout (opf, options, error);
 	      }
 	    list_destroy (list);
 	    }
           }
         free (content_dir);
+        free (opf);
         }
 
       if (rootfile) string_destroy (rootfile);
@@ -508,6 +508,8 @@ void epub2txt_do_file (const char *file, const Epub2TxtOptions *options,
       {
       // unzip failed
       }
+
+    free (tempdir);
     }
   else
     {
