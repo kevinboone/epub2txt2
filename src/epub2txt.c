@@ -11,8 +11,6 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/wait.h>
-#include <signal.h>
 #include <errno.h>
 #ifndef __APPLE__
 #include <malloc.h>
@@ -23,6 +21,7 @@
 #include "string.h"
 #include "sxmlc.h"
 #include "xhtml.h"
+#include "util.h"
 
 /*============================================================================
   epub2txt_unescape_html
@@ -401,7 +400,6 @@ void epub2txt_do_file (const char *file, const Epub2TxtOptions *options,
     log_debug ("File access OK");
 
     char *tempbase, *tempdir;
-    char cmd[1024];
 
     if (!(tempbase = getenv("TMP")) && !(tempbase = getenv("TMPDIR")))
       tempbase = "/tmp";
@@ -422,32 +420,19 @@ void epub2txt_do_file (const char *file, const Epub2TxtOptions *options,
     BOOL unzip_ok = TRUE;
 
     log_debug ("Running unzip command");
-    int pid = fork();
-    if (pid == 0)
-      {
-      execlp ("unzip", "unzip", "-o", "-qq", file, "-d", tempdir, NULL);
-      log_error ("Can't execute unzip: %s", strerror (errno));
-      kill (getppid(), SIGTERM);
-      exit (-1);
-      }
-    else
-      {
-      int status = 0;
-      waitpid (pid, &status, 0);
-      // We could set unzip_ok here, but I'm not sure that unzip really
-      //  returns a reliable status code
-      }
+    run_command ((const char *[]){"unzip", "-o", "-qq", file, "-d", tempdir,
+      NULL}, TRUE);
+    // We could set unzip_ok here, but I'm not sure that unzip really
+    //  returns a reliable status code
 
     if (unzip_ok)
       {
       log_debug ("Unzip finished");
       // On some systems, unzip results in a file with no read permissions
-      //   for the user -- reason unknown 
-      sprintf (cmd, "chmod -R 744 \"%s\"", tempdir);
-      log_debug ("Fix permissions: %s", cmd);
-      system (cmd);
+      //   for the user -- reason unknown
+      log_debug ("Fix permissions: %s", tempdir);
+      run_command((const char *[]){"chmod", "-R", "744", tempdir, NULL}, FALSE);
       log_debug ("Permissions fixed");
-
 
       char *opf;
       asprintf (&opf, "%s/META-INF/container.xml", tempdir);
@@ -500,9 +485,8 @@ void epub2txt_do_file (const char *file, const Epub2TxtOptions *options,
         }
 
       if (rootfile) string_destroy (rootfile);
-      sprintf (cmd, "rm -rf \"%s\"", tempdir);
       log_debug ("Deleting temporary directory");
-      system (cmd); 
+      run_command ((const char *[]){"rm", "-rf", tempdir, NULL}, FALSE);
       }
     else
       {
