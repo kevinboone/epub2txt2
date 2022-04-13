@@ -92,7 +92,12 @@ BOOL wstring_create_from_utf8_file (const char *filename,
     close (f);
     buff[n] = 0;
 
-    self->str = wstring_convert_utf8_to_utf32 (buff);
+    // Might need to skip a UTF-8 BOM when reading file
+    if (buff[0] == (char)0xEF && buff[1] == (char)0xBB && buff[2] == (char)0xBF)
+      self->str = wstring_convert_utf8_to_utf32 (buff + 3);
+    else
+      self->str = wstring_convert_utf8_to_utf32 (buff);
+
     free (buff);
 
     *result = self;

@@ -250,9 +250,21 @@ BOOL string_create_from_utf8_file (const char *filename,
     fstat (f, &sb);
     int64_t size = sb.st_size;
     char *buff = malloc (size + 2);
-    read (f, buff, size);
     self->str = buff; 
-    self->str[size] = 0;
+
+    // Read the first three characters, to check for a UTF-8 byte-order-mark
+    read (f, buff, 3);
+    if (buff[0] == (char)0xEF && buff[1] == (char)0xBB && buff[2] == (char)0xBF)
+      {
+      read (f, buff, size - 3);
+      self->str[size - 3] = 0;
+      }
+    else
+      {
+      read (f, buff + 3, size - 3);
+      self->str[size] = 0;
+      }
+
     *result = self;
     ok = TRUE;
     }
