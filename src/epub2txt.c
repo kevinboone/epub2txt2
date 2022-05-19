@@ -142,10 +142,16 @@ static List *epub2txt_dump_metadata (const char *opf,
 	    XMLNode *r2 = metadata->children[i];
             const char *mdtag = r2->tag;
             const char *mdtext = r2->text;
+            // Don't try to print anything if the metadata text is null
+            if (!mdtext) continue;
             if (strstr (mdtag, "creator"))
               epub2txt_format_meta (options, "Creator", mdtext);
             else if (strstr (mdtag, "publisher"))
               epub2txt_format_meta (options, "Publisher", mdtext);
+            else if (strstr (mdtag, "contributor"))
+              epub2txt_format_meta (options, "Contributor", mdtext);
+            else if (strstr (mdtag, "identifier"))
+              epub2txt_format_meta (options, "Identifier", mdtext);
             else if (strstr (mdtag, "date"))
               {
               char *mdate = strdup (mdtext);

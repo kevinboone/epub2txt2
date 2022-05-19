@@ -1,7 +1,8 @@
 VERSION := 2.05
 CC      := gcc
 CFLAGS  := -Wall -fPIC -fPIE 
-LDFLAGS := -pie -s
+#LDFLAGS := -pie -s
+LDFLAGS := -pie 
 DESTDIR :=
 PREFIX  := /usr
 BINDIR  := /bin
