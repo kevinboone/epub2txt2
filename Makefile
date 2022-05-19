@@ -1,4 +1,4 @@
-VERSION := 2.04
+VERSION := 2.05
 CC      := gcc
 CFLAGS  := -Wall -fPIC -fPIE 
 LDFLAGS := -pie -s

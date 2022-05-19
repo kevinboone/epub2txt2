@@ -89,14 +89,22 @@ static char *epub2txt_unescape_html (const char *s)
 static void epub2txt_format_meta (const Epub2TxtOptions *options, 
           const char *key, const char *text)
   {
-  char *ss = epub2txt_unescape_html (text);
-  char *s;
-  asprintf (&s, "%s: %s", key, ss);
-  char *error = NULL;
-  xhtml_utf8_to_stdout (s, options, &error);
-  if (error) free (error);
-  free (s);
-  free (ss);
+  // text ends up "null" here, if the meta tag had no content (which should
+  //   not happen, but we don't want to crash if it does). I suppress all
+  //   output in this case, but perhaps it would be better to print the
+  //   metadata key, and the value "null", or "empty"? I can't really predict
+  //   what a user would prefer to see.
+  if (text)
+    {
+    char *ss = epub2txt_unescape_html (text);
+    char *s;
+    asprintf (&s, "%s: %s", key, ss);
+    char *error = NULL;
+    xhtml_utf8_to_stdout (s, options, &error);
+    if (error) free (error);
+    free (s);
+    free (ss);
+    }
   }
 
 
