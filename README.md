@@ -182,51 +182,61 @@ characters as input, so these need to be disabled.
 
 ## Bugs and limitations 
 
+The main development priorities for `epub2txt` are speed and compactness, not
+military-grade security.  The program is not designed for use in hostile
+environments, such as processing input from the Internet.  It's almost
+certainly possible to craft an EPUB file that will cause a buffer overrun or
+stack collision, with uncertain results. I don't want to bloat the utility
+further by adding checks for every conceivable failure that a hostile EPUB
+might manifest.  Please don't use `epub2txt` for applications where security is
+a primary concern -- it's not designed for this, and is really not suitable. 
+
 There is no support for any form of DRM or encryption, and such support
 is unlikely to be added in the future.
 
-`epub2txt` only handles documents that use 
-UTF8 (or ASCII) encoding (but I believe that UTF8 is more-or-less 
-universal in EPUB), 
-and writes output only in UTF8 encoding,
-regardless of the platform's locale. This limitation exists because
-`epub2txt` does all its own 
-character encoding conversions
-to avoid creating a dependency on an external library. Doing this for UTF8
-is enough work on its own; doing it for arbitrary encodings would be 
-overwhelming. 
+`epub2txt` only handles documents that use UTF8 (or ASCII) encoding (but I
+believe that UTF8 is more-or-less universal in EPUB), and writes output only in
+UTF8 encoding, regardless of the platform's locale. This limitation exists
+because `epub2txt` does all its own character encoding conversions to avoid
+creating a dependency on an external library. Doing this for UTF8 is enough
+work on its own; doing it for arbitrary encodings would be overwhelming. 
 
-The program can't correct errors in encoding, and there are a large number
-of EPUB documents in public repositories that contain encoding errors.
-A common problem is spurious use of non-UTF8 8-bit characters, often 
-in documents that have been converted from Microsoft Office applications.
+The program can't correct errors in encoding, and there are a large number of
+EPUB documents in public repositories that contain encoding errors.  A common
+problem is spurious use of non-UTF8 8-bit characters, often in documents that
+have been converted from Microsoft Office applications.
 
-`epub2txt` does not right-justify text, as there are already many
-good utilities to do this (e.g., `groff`)
+`epub2txt` does not right-justify text, as there are already many good
+utilities to do this (e.g., `groff`)
 
-`epub2txt` extracts text aggressively, and will include things that
-cannot possibly be rendered properly in plain text. This includes constructs
-like indices and tables of contents, which will be of little use. The captions
-of pictures will also likely be included, even though the pictures themselves
-can not. It seemed
-better to err on the side of extracting too much text than too little;
-unfortunately there is little in the EPUB format to distinguish content that
-is meaningful in a text-only representation from that which is not. 
+`epub2txt` extracts text aggressively, and will include things that cannot
+possibly be rendered properly in plain text. This includes constructs like
+indices and tables of contents, which will be of little use. The captions of
+pictures will also likely be included, even though the pictures themselves can
+not. It seemed better to err on the side of extracting too much text than too
+little; unfortunately there is little in the EPUB format to distinguish content
+that is meaningful in a text-only representation from that which is not. 
 
-It is unlikely that any kind of fixed-layout structure of the 
-source document will be rendered accurately in plain text, so
-`epub2txt` does not try. Tabs and other layout elements are 
-collapsed
-into spaces, and text re-flowed according to the line length (except
-in raw mode).
+It is unlikely that any kind of fixed-layout structure of the source document
+will be rendered accurately in plain text, so `epub2txt` does not try. Tabs and
+other layout elements are collapsed into spaces, and text re-flowed according
+to the line length (except in raw mode).
 
 Conversion of Unicode to ASCII is, in the general case, impossible. The
-`--ascii` switch tells `epub2txt` to perform some
-common conversions, such as straight quotes for angled quotes.
-It will also attempt to replace accented latin characters with non-accented
-equivalents, at least for commonly-used characters. However, there are
-a huge number of characters in the Unicode set that cannot be rendered,
-even approximately, in ASCII. 
+`--ascii` switch tells `epub2txt` to perform some common conversions, such as
+straight quotes for angled quotes.  It will also attempt to replace accented
+Latin characters with non-accented equivalents, at least for commonly-used
+characters. However, there are a huge number of characters in the Unicode set
+that cannot be rendered, even approximately, in ASCII. 
+
+It would be possible to enhance `epub2txt` so that it outputs HTML, or
+LaTeX, or PDF; it would be possible to add searching and indexing features;
+it would be possible to extend it to include other input formats. 
+However, I intended `epub2txt` to be a simple, lightweight utility and,
+at present, I consider it to be feature-complete. One day I might develop
+a more sophisticated version but, frankly, Calibre already has this
+covered.
+
 
 ## Revision history 
 
