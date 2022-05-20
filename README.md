@@ -91,7 +91,7 @@ For a full list, run `epub2txt --help`.
 `-a, --asiii`
 
 Reduces multi-byte charaters to 7-bit ASCII if possible. Some very common
-characters are easilty converted, like the various Unicode spaces, which 
+characters are easily converted, like the various Unicode spaces, which 
 can be converted into plain ASCII spaces. Common accented characters
 (.e.,g "&eacute;" are converted -- for better or worse -- into their
 non-accented equivalents. Some single-character entities like &copy;
@@ -135,7 +135,7 @@ standard input or standard output of the `epub2txt` program
 is a terminal, the program will try to work out how wide it is. If it
 can't, it will assume 80 characters. The implication of using
 standard input to determine terminal width is that 
-`epub2txt` still assumes it must produced fixed-width output, 
+`epub2txt` still assumes it must produce fixed-width output, 
 even if output is redirected to some other
 utility. This makes it possible to use `epub2txt` without 
 specific command-line switches in common modes of operation like:
@@ -228,6 +228,8 @@ straight quotes for angled quotes.  It will also attempt to replace accented
 Latin characters with non-accented equivalents, at least for commonly-used
 characters. However, there are a huge number of characters in the Unicode set
 that cannot be rendered, even approximately, in ASCII. 
+
+Only limited testing has been done with EPUB 3.x documents.
 
 It would be possible to enhance `epub2txt` so that it outputs HTML, or
 LaTeX, or PDF; it would be possible to add searching and indexing features;
