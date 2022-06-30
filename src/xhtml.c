@@ -530,6 +530,8 @@ WString *xhtml_transform_char (uint32_t c, BOOL to_ascii)
 ============================================================================*/
 WString *xhtml_translate_entity (const WString *entity)
   {
+  /* Program flow in this function is very ugly, and prone to memory
+     leaks when modified. The whole thing needs to be rewritten */
   char out[20];
   IN
   char *in = wstring_to_utf8 (entity);
@@ -569,8 +571,11 @@ WString *xhtml_translate_entity (const WString *entity)
       WString *ret = wstring_create_empty();
       wstring_append_c (ret, (uint32_t)v);
       OUT
+      free (s);
+      free (in);
       return ret; 
       } 
+    free (s);
     }
   else 
     {

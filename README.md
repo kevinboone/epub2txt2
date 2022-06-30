@@ -244,6 +244,7 @@ covered.
 
 Date | Change
 -----|-------
+?,&nbsp;Jun&nbsp;2022 | Fixed handling of URL-encoded spine href's 
 2.06,&nbsp;Jun&nbsp;2022 | Fixed bug in invoking unzip 
 2.05,&nbsp;Apr&nbsp;2022 | Fixed bug with empty metadata tags 
 2.04,&nbsp;Apr&nbsp;2022 | Improved handling of UTF-8 BOMs 

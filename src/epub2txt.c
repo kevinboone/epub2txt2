@@ -312,7 +312,8 @@ List *epub2txt_get_items (const char *opf, char **error)
 			char *val2 = r3->attributes[p].value;
 			if (strcmp (name2, "href") == 0)
 			  {
-			  list_append (ret, strdup (val2));
+                          char *decoded_val2 = decode_url (val2);
+			  list_append (ret, decoded_val2);
 			  }
 			}
 		      }
