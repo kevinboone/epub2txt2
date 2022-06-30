@@ -259,8 +259,8 @@ Date | Change
 
 ## Author and legal 
 
-`epub2txt` is maintained by Kevin Boone, and distributed under the terms
-of the GNU Public Licence, v3.0. Essentially, this means that you may 
-use this software as you wish, at your own risk, provided that the 
-original author continues to be acknowledged.
+`epub2txt` is maintained by Kevin Boone, with contributions from various other
+people, and distributed under the terms of the GNU Public Licence, v3.0.
+Essentially, this means that you may use this software as you wish, at your
+own risk, provided that the original authors continue to be acknowledged.
 
