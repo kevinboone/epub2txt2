@@ -449,7 +449,7 @@ void epub2txt_do_file (const char *file, const Epub2TxtOptions *options,
       run_command((const char *[]){"chmod", "-R", "744", tempdir, NULL}, FALSE);
       log_debug ("Permissions fixed");
 
-      char *opf;
+      char *opf, *tmp;
       asprintf (&opf, "%s/META-INF/container.xml", tempdir);
       log_debug ("OPF path is: %s", opf);
       String *rootfile = epub2txt_get_root_file (opf, error);
@@ -458,7 +458,20 @@ void epub2txt_do_file (const char *file, const Epub2TxtOptions *options,
         log_debug ("OPF rootfile is: %s", string_cstr(rootfile));
 
         free (opf);
-        asprintf (&opf, "%s/%s", tempdir, string_cstr (rootfile));
+        asprintf (&tmp, "%s/%s", tempdir, string_cstr (rootfile));
+        opf = canonicalize_file_name (tmp);
+        free (tmp);
+
+        if (opf == NULL || !is_subpath (tempdir, opf))
+          {
+          if (opf == NULL)
+            asprintf (error, "Bad OPF rootfile path: %s", strerror (errno));
+          else
+            asprintf (error, "Bad OPF rootfile path \"%s\": outside EPUB "
+              "container", opf);
+          free (tempdir);
+          return;
+          }
 
         char *content_dir = strdup (opf);
         char *p = strrchr (content_dir, '/');
@@ -489,7 +502,21 @@ void epub2txt_do_file (const char *file, const Epub2TxtOptions *options,
 	      {
 	      const char *item = (const char *)list_get (list, i);
 	      free (opf);
-	      asprintf (&opf, "%s/%s", content_dir, item);
+	      asprintf (&tmp, "%s/%s", content_dir, item);
+	      opf = canonicalize_file_name (tmp);
+	      free (tmp);
+
+	      if (opf == NULL || !is_subpath (content_dir, opf))
+	        {
+	        if (opf == NULL)
+	          log_warning ("Skipping EPUB file \"%s\": invalid path (%s)",
+	            item, strerror (errno));
+	        else
+	          log_warning ("Skipping EPUB file \"%s\": outside EPUB content "
+	            "directory", item);
+	        continue;
+	        }
+
 	      xhtml_file_to_stdout (opf, options, error);
 	      }
 	    list_destroy (list);
