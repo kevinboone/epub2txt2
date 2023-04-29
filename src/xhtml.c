@@ -852,7 +852,8 @@ void xhtml_to_stdout (const WString *s, const Epub2TxtOptions *options,
 	      }
 	    }
 	  else if ((strcasecmp (ss_tag, "br/") == 0) 
-	      || (strcasecmp (ss_tag, "br") == 0))
+	      || (strcasecmp (ss_tag, "br") == 0)
+	      || (strcasecmp (ss_tag, "br /") == 0))
 	    {
 	    if (inbody)
 	      {
