@@ -13,6 +13,9 @@
 // UTF8, including a terminating 0
 #define WT_UTF8_MAX_BYTES 8 
 
+// Hard line break should be an unusued code point
+#define WT_HARD_LINE_BREAK 9999
+
 typedef uint32_t WT_UTF32;
 typedef char WT_UTF8;
 

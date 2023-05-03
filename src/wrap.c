@@ -238,6 +238,12 @@ void _wraptext_wrap_next (WrapTextContext *context, const WT_UTF32 c)
 
   // STATE_WORD
 
+  else if (state == WT_STATE_WORD && c == WT_HARD_LINE_BREAK)
+     {
+     _wraptext_flush_token (context);
+     _wraptext_new_line (context);
+     state = WT_STATE_START;
+     }
   else if (state == WT_STATE_WORD && _wraptext_is_newline (c))
      {
      _wraptext_flush_token (context);

@@ -632,7 +632,8 @@ void xhtml_flush_para (const WString *para, const Epub2TxtOptions *options,
 void xhtml_line_break (WrapTextContext *context) 
   {
   IN
-  static uint32_t s[2] = { '\n', 0 };
+  //static uint32_t s[2] = { '\n', 0 };
+  static uint32_t s[2] = { WT_HARD_LINE_BREAK, 0 };
   wraptext_wrap_utf32 (context, s);
   wraptext_eof (context);
   OUT
