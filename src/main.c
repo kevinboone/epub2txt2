@@ -1,7 +1,7 @@
 /*============================================================================
   epub2txt v2 
   main.c
-  Copyright (c)2020 Kevin Boone, GPL v3.0
+  Copyright (c)2020-2024 Kevin Boone, GPL v3.0
 ============================================================================*/
 
 #include <stdio.h>
@@ -12,9 +12,19 @@
 #include <sys/ioctl.h>
 #include <termios.h>
 #include <getopt.h>
+#include <signal.h>
 #include "epub2txt.h" 
 #include "defs.h" 
 #include "log.h" 
+
+/*============================================================================
+  sig_handler 
+============================================================================*/
+static void sig_handler (int)
+  {
+  epub2txt_cleanup();
+  exit (0);
+  }
 
 /*============================================================================
   main
@@ -178,6 +188,11 @@ int main (int argc, char **argv)
     options.ansi = FALSE; 
  
   options.raw = raw;
+
+  signal (SIGPIPE, sig_handler);
+  signal (SIGQUIT, sig_handler);
+  signal (SIGINT, sig_handler);
+  signal (SIGHUP, sig_handler);
 
   int i;
   for (i = optind; i < argc; i++)

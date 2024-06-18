@@ -22,3 +22,5 @@ typedef struct _Epub2TxtOptions
 void epub2txt_do_file (const char *file, const Epub2TxtOptions *options, 
      char **error);
 
+void epub2txt_cleanup (void);
+

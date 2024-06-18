@@ -23,6 +23,8 @@
 #include "xhtml.h"
 #include "util.h"
 
+static char *tempdir = NULL;
+
 /*============================================================================
   epub2txt_unescape_html
   The metadata fields in EPUB are XHTML escaped into plain text using
@@ -399,7 +401,19 @@ String *epub2txt_get_root_file (const char *opf, char **error)
   return ret;
   }
 
-
+/*============================================================================
+  epub2txt_cleanup
+============================================================================*/
+void epub2txt_cleanup (void)
+  {
+  if (tempdir)
+    {
+    log_debug ("Deleting temporary directory");
+    run_command ((const char *[]){"rm", "-rf", tempdir, NULL}, FALSE);
+    free (tempdir);
+    tempdir = NULL;
+    }
+  }
 
 /*============================================================================
   epub2txt 
@@ -414,7 +428,7 @@ void epub2txt_do_file (const char *file, const Epub2TxtOptions *options,
     {
     log_debug ("File access OK");
 
-    char *tempbase, *tempdir;
+    char *tempbase;
 
     if (!(tempbase = getenv("TMP")) && !(tempbase = getenv("TMPDIR")))
       tempbase = "/tmp";
@@ -500,15 +514,13 @@ void epub2txt_do_file (const char *file, const Epub2TxtOptions *options,
         }
 
       if (rootfile) string_destroy (rootfile);
-      log_debug ("Deleting temporary directory");
-      run_command ((const char *[]){"rm", "-rf", tempdir, NULL}, FALSE);
       }
     else
       {
       // unzip failed
       }
 
-    free (tempdir);
+    epub2txt_cleanup();
     }
   else
     {
