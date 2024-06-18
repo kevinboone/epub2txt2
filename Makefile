@@ -1,8 +1,8 @@
 VERSION := 2.07
 CC      := gcc
-CFLAGS  := -Wall -fPIC -fPIE 
-#LDFLAGS := -pie -s
-LDFLAGS := -pie 
+CFLAGS  := ${CFLAGS} -Wall
+#LDFLAGS := -pie -s # Android
+LDFLAGS := -s
 DESTDIR :=
 PREFIX  := /usr
 BINDIR  := /bin
@@ -19,7 +19,7 @@ $(TARGET): $(OBJECTS)
 
 build/%.o: src/%.c
 	@mkdir -p build/
-	$(CC) $(CFLAGS) -g -DVERSION=\"$(VERSION)\" -DAPPNAME=\"$(APPNAME)\" -MD -MF $(@:.o=.deps) -c -o $@ $< 
+	$(CC) $(CFLAGS) -DVERSION=\"$(VERSION)\" -DAPPNAME=\"$(APPNAME)\" -MD -MF $(@:.o=.deps) -c -o $@ $< 
 
 clean:
 	$(RM) -r build/ $(TARGET) 
