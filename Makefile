@@ -1,8 +1,10 @@
-VERSION := 2.07
+VERSION := 2.08
 CC      := gcc
-CFLAGS  := ${CFLAGS} -Wall
+EXTRA_CFLAGS ?= 
+EXTRA_LDLAGS ?= 
+CFLAGS  := -Wall -Wno-unused-result -O3 $(EXTRA_CFLAGS)
 #LDFLAGS := -pie -s # Android
-LDFLAGS := -s
+LDFLAGS := -s $(EXTRA_LDFLAGS)
 DESTDIR :=
 PREFIX  := /usr
 BINDIR  := /bin

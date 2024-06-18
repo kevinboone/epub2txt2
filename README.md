@@ -244,6 +244,7 @@ covered.
 
 Date | Change
 -----|-------
+2.08,&nbsp;Jun&nbsp;2024 | Fixed a memory-management warning 
 ?,&nbsp;Jun&nbsp;2024 | Removed position-independent code attributes from defaults 
 2.07,&nbsp;Jun&nbsp;2024 | Improved clean-up if program killed in a pipe
 ?,&nbsp;Jun&nbsp;2022 | Fixed handling of URL-encoded spine href's 

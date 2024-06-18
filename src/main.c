@@ -146,7 +146,7 @@ int main (int argc, char **argv)
   if (show_version)
     {
     printf (APPNAME " version " VERSION "\n");
-    printf ("Copyright (c)2013-2022 Kevin Boone and contributors\n");
+    printf ("Copyright (c)2013-2024 Kevin Boone and contributors\n");
     printf ("Distributed under the terms of the GNU Public Licence, v3.0\n");
     exit (0);
     }

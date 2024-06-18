@@ -57,7 +57,8 @@ void wraptext_context_utf32_char_to_utf8 (const uint32_t c, WT_UTF8* utf8)
   UTF8 *out_temp = out;
 
   ConvertUTF32toUTF8 (&in, in + 1,
-      &out_temp, out + max_out * 4, 0);
+      //&out_temp, out + max_out * 4, 0);
+      &out_temp, out + max_out, 0);
   int len = out_temp - out;
   utf8[len] = 0;
   }
