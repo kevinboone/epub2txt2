@@ -80,4 +80,18 @@ char *decode_url (const char *url)
   return ret;
   }
 
-
+/*==========================================================================
+  is_subpath
+  Determine whether path is a subpath of root; or in other words, whether path
+  points to a file/directory inside root. Both root and path are assumed to be
+  in canonical form, therefore the caller should make sure of this using e.g.
+  canonicalize_file_name().
+  (Marco Bonelli)
+*==========================================================================*/
+BOOL is_subpath (const char *root, const char *path)
+  {
+    size_t root_len = strlen (root);
+    size_t path_len = strlen (path);
+    return path_len > root_len && !strncmp (root, path, root_len)
+      && path[root_len] == '/';
+  }
