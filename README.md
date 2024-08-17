@@ -1,6 +1,6 @@
 # epub2txt -- Extract text from EPUB documents  
 
-Version 2.07, June 2024 
+Version 2.09, June 2024 
 
 ## What is this? 
 
@@ -244,6 +244,7 @@ covered.
 
 Date | Change
 -----|-------
+2.09,&nbsp;Aug&nbsp;2024 | Improved failure mode wth certain corrupt EPUBs 
 2.08,&nbsp;Jun&nbsp;2024 | Fixed a memory-management warning 
 ?,&nbsp;Jun&nbsp;2024 | Removed position-independent code attributes from defaults 
 2.07,&nbsp;Jun&nbsp;2024 | Improved clean-up if program killed in a pipe

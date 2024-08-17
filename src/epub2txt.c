@@ -257,17 +257,26 @@ List *epub2txt_get_items (const char *opf, char **error)
       {
       XMLNode *root = XMLDoc_root (&doc);
 
-      int i, l = root->n_children;
-      for (i = 0; i < l; i++)
-	{
-	XMLNode *r1 = root->children[i];
-	// Add workaround for bug #4 
-	if (strcmp (r1->tag, "manifest") == 0 || strstr (r1->tag, ":manifest"))
+      int l;
+      if (root)
+        {
+	int i;
+        l = root->n_children;
+	for (i = 0; i < l; i++)
 	  {
-	  manifest = r1;
-	  got_manifest = TRUE;
+	  XMLNode *r1 = root->children[i];
+	  // Add workaround for bug #4 
+	  if (strcmp (r1->tag, "manifest") == 0 || strstr (r1->tag, ":manifest"))
+	    {
+	    manifest = r1;
+	    got_manifest = TRUE;
+	    }
 	  }
-	}
+        }
+      else
+        {
+        log_warning ("'%s' has no root eleemnt -- corrupt EPUB?", opf);
+        }
 
       if (!got_manifest)
 	{
@@ -278,7 +287,7 @@ List *epub2txt_get_items (const char *opf, char **error)
    
       ret = list_create_strings();
 
-      for (i = 0; i < l; i++)
+      for (int i = 0; i < l; i++)
 	{
 	XMLNode *r1 = root->children[i];
 	// Add workaround for bug #4
@@ -358,33 +367,40 @@ String *epub2txt_get_root_file (const char *opf, char **error)
     if (XMLDoc_parse_buffer_DOM (buff_cstr, APPNAME, &doc))
       {
       XMLNode *root = XMLDoc_root (&doc);
-      int i, l = root->n_children;
-      for (i = 0; i < l; i++)
-	{
-	XMLNode *r1 = root->children[i];
-	if (strcmp (r1->tag, "rootfiles") == 0)
+      if (root)
+        {
+        int i, l = root->n_children;
+	for (i = 0; i < l; i++)
 	  {
-	  XMLNode *rootfiles = r1;
-	  int i, l = rootfiles->n_children;
-	  for (i = 0; i < l; i++)
+	  XMLNode *r1 = root->children[i];
+	  if (strcmp (r1->tag, "rootfiles") == 0)
 	    {
-	    XMLNode *r1 = rootfiles->children[i];
-	    if (strcmp (r1->tag, "rootfile") == 0)
+	    XMLNode *rootfiles = r1;
+	    int i, l = rootfiles->n_children;
+	    for (i = 0; i < l; i++)
 	      {
-	      int k, nattrs = r1->n_attributes;
-	      for (k = 0; k < nattrs; k++)
+	      XMLNode *r1 = rootfiles->children[i];
+	      if (strcmp (r1->tag, "rootfile") == 0)
 		{
-		char *name = r1->attributes[k].name;
-		char *value = r1->attributes[k].value;
-		if (strcmp (name, "full-path") == 0)
+		int k, nattrs = r1->n_attributes;
+		for (k = 0; k < nattrs; k++)
 		  {
-		  ret = string_create (value);
+		  char *name = r1->attributes[k].name;
+		  char *value = r1->attributes[k].value;
+		  if (strcmp (name, "full-path") == 0)
+		    {
+		    ret = string_create (value);
+		    }
 		  }
 		}
 	      }
 	    }
 	  }
-	}
+        }
+      else
+        {
+        log_warning ("No root element in '%s' -- corrupt EPUB?", opf);
+        }
 
       if (ret == NULL)
         asprintf (error, "container.xml does not specify a root file");

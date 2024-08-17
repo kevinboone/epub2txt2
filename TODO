@@ -1,7 +1,7 @@
 Format characters include the white space after tokens,
 which doesn't show up with bold, etc., but is still wrong.
 
-There is additional white-space inserted after a format change is
+There is additional white-space inserted when a format change is
 followed by a numeric HTML entity. This _does_ show up, and it looks
 ugly. It's a format that's rarely used, but really needs fixing. 
 Unfortunately, this will require a radical change to the formatting
