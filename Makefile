@@ -1,4 +1,4 @@
-VERSION := 2.09
+VERSION := 2.10
 CC      := gcc
 EXTRA_CFLAGS ?= 
 EXTRA_LDLAGS ?= 
