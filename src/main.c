@@ -20,8 +20,9 @@
 /*============================================================================
   sig_handler 
 ============================================================================*/
-static void sig_handler (int)
+static void sig_handler (int signo)
   {
+  (void)signo;
   epub2txt_cleanup();
   exit (0);
   }
