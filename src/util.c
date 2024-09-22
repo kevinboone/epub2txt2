@@ -85,7 +85,7 @@ char *decode_url (const char *url)
   Determine whether path is a subpath of root; or in other words, whether path
   points to a file/directory inside root. Both root and path are assumed to be
   in canonical form, therefore the caller should make sure of this using e.g.
-  canonicalize_file_name().
+  canonicalize_file_name(path) or realpath(path, NULL).
   (Marco Bonelli)
 *==========================================================================*/
 BOOL is_subpath (const char *root, const char *path)
