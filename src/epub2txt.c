@@ -5,6 +5,7 @@
 ============================================================================*/
 
 #define _GNU_SOURCE
+#define _XOPEN_SOURCE 500
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -489,7 +490,7 @@ void epub2txt_do_file (const char *file, const Epub2TxtOptions *options,
 
         free (opf);
         asprintf (&tmp, "%s/%s", tempdir, string_cstr (rootfile));
-        opf = canonicalize_file_name (tmp);
+        opf = realpath (tmp, NULL);
         free (tmp);
 
         if (opf == NULL || !is_subpath (tempdir, opf))
@@ -533,7 +534,7 @@ void epub2txt_do_file (const char *file, const Epub2TxtOptions *options,
 	      const char *item = (const char *)list_get (list, i);
 	      free (opf);
 	      asprintf (&tmp, "%s/%s", content_dir, item);
-	      opf = canonicalize_file_name (tmp);
+	      opf = realpath (tmp, NULL);
 	      free (tmp);
 
 	      if (opf == NULL || !is_subpath (content_dir, opf))
