@@ -742,6 +742,8 @@ void xhtml_to_stdout (const WString *s, const Epub2TxtOptions *options,
      WString *tag = wstring_create_empty();
      WString *entity = wstring_create_empty();
      WString *para = wstring_create_empty();
+     WString *ruby = wstring_create_empty();
+     BOOL inruby = FALSE;
      int i, l = wstring_length (s);
      uint32_t last_c = 0;
      int taglen = 0;
@@ -786,7 +788,7 @@ void xhtml_to_stdout (const WString *s, const Epub2TxtOptions *options,
 	    else
 	      {
 	      WString *s = xhtml_transform_char (c, options->ascii);
-	      wstring_append (para, s);
+	      wstring_append (inruby ? ruby : para, s);
 	      wstring_destroy (s);
 	      }
 	    }
@@ -796,7 +798,7 @@ void xhtml_to_stdout (const WString *s, const Epub2TxtOptions *options,
 	  if (inbody)
 	    {
 	    WString *trans = xhtml_translate_entity (entity);
-	    wstring_append (para, trans);
+	    wstring_append (inruby ? ruby : para, trans);
 	    wstring_destroy (trans);
 	    }
 	  wstring_clear (entity);
@@ -908,6 +910,28 @@ void xhtml_to_stdout (const WString *s, const Epub2TxtOptions *options,
             xhtml_set_format (options, format, context);
             }
 
+    else if (strcasecmp(ss_tag, "ruby") == 0)
+      {
+      wstring_clear (ruby);
+      }
+    else if (strcasecmp(ss_tag, "/ruby") == 0)
+      {
+        // Append concatenated ruby annotations
+      wstring_append_c (para, '(');
+      wstring_append (para, ruby);
+      wstring_append_c (para, ')');
+      wstring_clear (ruby);
+      }
+    else if (strcasecmp(ss_tag, "rt") == 0)
+      {
+          // Start accumulating ruby annotations
+        inruby = TRUE;
+      }
+    else if (strcasecmp(ss_tag, "/rt") == 0)
+      {
+        inruby = FALSE;
+      }
+
 	  free (ss_tag);
 	  wstring_clear (tag);
 	  mode = MODE_ANY;
@@ -942,6 +966,7 @@ void xhtml_to_stdout (const WString *s, const Epub2TxtOptions *options,
      wstring_destroy (tag);
      wstring_destroy (entity);
      wstring_destroy (para);
+     wstring_destroy (ruby);
 
      wraptext_eof (context);
      wraptext_context_free (context);
