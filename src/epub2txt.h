@@ -1,7 +1,7 @@
 /*============================================================================
   epub2txt v2 
   epub2txt.h
-  Copyright (c)2017-20 Kevin Boone, GPL v3.0
+  Copyright (c)2017-2024 Kevin Boone, GPL v3.0
 ============================================================================*/
 
 #pragma once
@@ -17,6 +17,7 @@ typedef struct _Epub2TxtOptions
   BOOL meta; // Show metadata
   BOOL notext; // Don't dump text 
   BOOL calibre; // Show Calibre metadata 
+  char *section_separator; // Section separator; may be NULL
   } Epub2TxtOptions;
 
 void epub2txt_do_file (const char *file, const Epub2TxtOptions *options, 

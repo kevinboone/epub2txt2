@@ -64,6 +64,12 @@ is implied. This is the fastest way to extract text, and is appropriate
 when feeding output to an external formatter such as \fIgroff\fR.
 .LP
 .TP
+.BI -s,\-\-separator=text
+Write the specified text to stdout before decoding each spine item.
+This option is intended to help users who want to split the output
+of \fIepub2txt\fR into chapters using scripts.
+.LP
+.TP
 .BI -w,\-\-width {columns}
 Format the output to fit into a specified width. If this option 
 is
@@ -73,11 +79,11 @@ the width is set to zero or less,
 then the output is assumed to be of
 unlimited width. Setting unlimited width can be useful in
 situations where the output is being processed
-by another application.  between paragraphs). 
+by another application. 
 .LP
 .TP
 .BI -v,\-\-version
-Displays the version and copyright infomation.
+Displays the version and copyright information.
 .LP
 
 .SH AUTHOR AND LEGAL

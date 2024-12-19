@@ -1,7 +1,7 @@
 /*============================================================================
   epub2txt v2 
   epub2txt.c
-  Copyright (c)2020 Kevin Boone, GPL v3.0
+  Copyright (c)2020-2024 Kevin Boone, GPL v3.0
 ============================================================================*/
 
 #define _GNU_SOURCE
@@ -547,6 +547,9 @@ void epub2txt_do_file (const char *file, const Epub2TxtOptions *options,
 	            "directory", item);
 	        continue;
 	        }
+
+	      if (options->section_separator)
+	        printf ("%s\n", options->section_separator);
 
 	      xhtml_file_to_stdout (opf, options, error);
 	      }
