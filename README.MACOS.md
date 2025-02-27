@@ -15,14 +15,9 @@ If you've already tried compiling `epub2txt` on macOS, you'll see a number of er
 
 This ensures macOS-specific libraries are used. 
 
-With this change, the `make` command will work, but `sudo make install` requires additional changes to the `Makefile`. If you're planning to always run `epub2txt` from a local directory and do not require a system-wide install, the next step is not required. If you are planning to run `sudo make install` to install `epub2txt` to run from any directory in the command line for all users, it's best to ensure that two directories exist prior to running `sudo make install`:
+With this change, the `make` command will work, but `sudo make install` requires additional changes to the `Makefile`. If you're planning to always run `epub2txt` from a local directory and do not require a system-wide install, the next step is not required.
 
-```
-/usr/local/bin
-/usr/local/share/man/man1
-```
-
-`/usr/local` will likely exist. If the other subdirectories don't exist, create them with `sudo`. Then modify the `Makefile` as follows:
+If you are planning to run `sudo make install` to install `epub2txt` to run from any directory in the command line for all users, modify the `Makefile` as follows:
 
 ```
 PREFIX  := usr/local
@@ -34,8 +29,10 @@ MANDIR  := share/man
 
 ```
 install:
-	install -D -m $(APPNAME) $(DESTDIR)/$(PREFIX)/$(BINDIR)
-	install -D -m man1/epub2txt.1 $(DESTDIR)/$(PREFIX)/$(MANDIR)/man1/epub2txt.1
+	mkdir -p $(DESTDIR)/$(PREFIX)/$(BINDIR)
+	mkdir -p $(DESTDIR)/$(PREFIX)/$(MANDIR)/man1
+	install -m 755 $(APPNAME) $(DESTDIR)/$(PREFIX)/$(BINDIR)/
+	install -m 644 man1/epub2txt.1 $(DESTDIR)/$(PREFIX)/$(MANDIR)/man1/
 ```
 
 Save all `Makefile` changes and run
